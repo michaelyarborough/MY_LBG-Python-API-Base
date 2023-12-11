@@ -11,7 +11,7 @@ pipeline {
                 docker rm nginx || echo "nginx not running"
                 docker rmi michaelyarborough/python-api || echi "python-api Image does not exist"
                 docker rmi michaelyarborough/mynginx || echi "mynginx Image does not exist"
-                Docker network create lbg_network || echo "lbg_network exists"
+                docker network create lbg_network || echo "lbg_network exists"
                 '''
            }
         }
