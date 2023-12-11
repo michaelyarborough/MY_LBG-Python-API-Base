@@ -48,8 +48,8 @@ pipeline {
             steps {
                 sh '''
                 docker system prune -f
-                docker rmi michaelyarborough/python-api  
-                docker rmi michaelyarborough/mynginx 
+                docker rmi michaelyarborough/python-api:v${BUILD_NUMBER}  
+                docker rmi michaelyarborough/mynginx:v${BUILD_NUMBER}
                 '''
             }
 
