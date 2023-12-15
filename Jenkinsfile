@@ -97,7 +97,6 @@ pipeline {
                 }
             }
             sh '''
-            docker rmi michaelyarborough/project-flask-api:latest
             docker system prune -f
             '''
                
