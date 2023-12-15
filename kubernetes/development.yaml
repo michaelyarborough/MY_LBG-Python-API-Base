@@ -68,7 +68,7 @@ spec:
 
       - name: flask-container
 
-        image: gcr.io/lbg-mea-16/michaey-python-api:latest
+        image: gcr.io/lbg-mea-16/michael-python-api:latest
         imagePullPolicy: Always
 
         ports:
