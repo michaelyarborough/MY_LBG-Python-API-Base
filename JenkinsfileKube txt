@@ -1,13 +1,23 @@
 pipeline {
+
     agent any
+
     environment {
+
         GCR_CREDENTIALS_ID = 'michaely' 
+
         IMAGE_NAME = 'michael-python-api'
+
         GCR_URL = 'gcr.io/lbg-mea-16'
+
     }
+
     stages {
+
         stage('Build and Push to GCR') {
+
     steps {
+
         script {
 
             // Authenticate with Google Cloud
