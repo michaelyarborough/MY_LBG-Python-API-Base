@@ -25,11 +25,11 @@ pipeline {
                  script {
 			        if (env.GIT_BRANCH == 'origin/main') {
                         sh '''
-                        docker build -t gcr.io/lbg-mea-16/michaely-project-flask-api:latest -t ggcr.io/lbg-mea-16/michaely-project-flask-api:prod-v${BUILD_NUMBER} .
+                        docker build -t michaelyarborough/project-flask-api -t michaelyarborough/project-flask-api:prod-v${BUILD_NUMBER} .
                         '''
                     } else if (env.GIT_BRANCH == 'origin/dev') {
                         sh '''
-                        docker build -t gcr.io/lbg-mea-16/michaely-project-flask-api -t gcr.io/lbg-mea-16/michaely-project-flask-api:dev-v${BUILD_NUMBER} .
+                        docker build -t michaelyarborough/project-flask-api -t michaelyarborough/project-flask-api:dev-v${BUILD_NUMBER} .
                         '''
                     } else {
                         sh '''
@@ -44,13 +44,13 @@ pipeline {
                 script {
 			        if (env.GIT_BRANCH == 'origin/main') {
                         sh '''
-                        docker push gcr.io/lbg-mea-16/michaely-project-flask-api
-                        docker push gcr.io/lbg-mea-16/michaely-project-flask-api:prod-v${BUILD_NUMBER}
+                        docker push michaelyarborough/project-flask-api
+                        docker push michaelyarborough/project-flask-api:prod-v${BUILD_NUMBER}
                         '''
                     } else if (env.GIT_BRANCH == 'origin/dev') {
                          sh '''
-                            docker push gcr.io/lbg-mea-16/michaely-project-flask-api
-                            docker push gcr.io/lbg-mea-16/michaely-project-flask-api:dev-v${BUILD_NUMBER}
+                            docker push michaelyarborough/project-flask-api
+                            docker push michaelyarborough/project-flask-api:dev-v${BUILD_NUMBER}
                           
                             '''
                     } else {
@@ -67,12 +67,12 @@ pipeline {
 			        if (env.GIT_BRANCH == 'origin/main') {
                         sh '''
                         kubectl apply -n prod -f ./kubernetes
-                        kubectl set image deployment/flask-api-deployment flask-container=gcr.io/lbg-mea-16/michaely-project-flask-api:prod-v${BUILD_NUMBER} -n prod
+                        kubectl set image deployment/flask-api-deployment flask-container=michaelyarborough/project-flask-api:prod-v${BUILD_NUMBER} -n prod
                         '''
                     } else if (env.GIT_BRANCH == 'origin/dev') {
                         sh '''
                         kubectl apply -n dev -f ./kubernetes
-                        kubectl set image deployment/flask-api-deployment flask-container=gcr.io/lbg-mea-16/michaely-project-flask-api:dev-v${BUILD_NUMBER} -n dev
+                        kubectl set image deployment/flask-api-deployment flask-container=michaelyarborough/project-flask-api:dev-v${BUILD_NUMBER} -n dev
                         '''
                     } else {
                         sh '''
@@ -88,11 +88,11 @@ pipeline {
                 script {
                 if(env.GIT_BRANCH == 'origin/main') {
                     sh '''
-                    docker rmi gcr.io/lbg-mea-16/michaely-project-flask-api:prod-v${BUILD_NUMBER}
+                    docker rmi michaelyarborough/project-flask-api:prod-v${BUILD_NUMBER}
                                         '''
                 } else if(env.GIT_BRANCH == 'origin/dev') {
                     sh '''
-                    docker rmi gcr.io/lbg-mea-16/michaely-project-flask-api:dev-v${BUILD_NUMBER} 
+                    docker rmi michaelyarborough/project-flask-api:dev-v${BUILD_NUMBER} 
                     '''
                 }
             }
