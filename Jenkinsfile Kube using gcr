@@ -25,7 +25,7 @@ pipeline {
                  script {
 			        if (env.GIT_BRANCH == 'origin/main') {
                         sh '''
-                        docker build -t gcr.io/lbg-mea-16/michaely-project-flask-api:latest -t ggcr.io/lbg-mea-16/michaely-project-flask-api:prod-v${BUILD_NUMBER} .
+                        docker build -t gcr.io/lbg-mea-16/michaely-project-flask-api:latest -t gcr.io/lbg-mea-16/michaely-project-flask-api:prod-v${BUILD_NUMBER} .
                         '''
                     } else if (env.GIT_BRANCH == 'origin/dev') {
                         sh '''
