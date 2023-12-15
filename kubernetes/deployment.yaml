@@ -1,39 +1,39 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: flask-service
-spec:
-  type: LoadBalancer
-  selector:
-    app: flask
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8080
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flask-deployment
+  name: flask-api-deployment
   labels:
-    app: flask
+    app: flask-api
 spec:
-  replicas: 2
+  replicas: 10
   selector:
     matchLabels:
-      app: flask
+      app: flask-api 
   strategy:
     rollingUpdate:
-      maxSurge: 20%
-      maxUnavailable: 20%
+      maxSurge: 25%
+      maxUnavailable: 25%
   template:
     metadata:
       labels:
-        app: flask
+        app: flask-api
     spec:
-      containers:
-      - name: flask-container
-        image: gcr.io/lbg-mea-16/michael-python-api:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 8080
+       containers:
+       - name: flask-acontainer
+         image: michaelyarborough/project-flask-api:latest
+         imagePullPolicy: Always
+         ports: 
+         - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-api-service
+spec:
+  type: ClusterIP 
+  selector:
+    app: flask-api
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080 

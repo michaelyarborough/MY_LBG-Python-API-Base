@@ -1,60 +1,107 @@
 pipeline {
     agent any
-    environment {
-        GCR_CREDENTIALS_ID = 'michaely' 
-        IMAGE_NAME = 'michael-python-api'
-        GCR_URL = 'gcr.io/lbg-mea-16'
-        PROJECT_ID = 'lbg-mea-16'
-        CLUSTER_NAME = 'michaely-cluster'
-        LOCATION = 'europe-west2-c'
-        CREDENTIALS_ID = 'michaely-private-key'
-    }
     stages {
-        stage('Build and Push to GCR') {
-    steps {
-        script {
-
-            // Authenticate with Google Cloud
-
-            withCredentials([file(credentialsId: GCR_CREDENTIALS_ID, variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-
-                sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
-
+        stage('Init') {
+            steps {
+                script {
+			        if (env.GIT_BRANCH == 'origin/main') {
+                        sh '''
+                        kubectl create ns prod || echo "Prod NS already exists"
+                        '''
+                    } else if (env.GIT_BRANCH == 'origin/dev') {
+                        sh '''
+                     kubectl create ns dev || echo "Dev NS already exists"
+                        '''
+                    } else {
+                        sh '''
+                        echo "Unrecognised branch"
+                        '''
+                    }
+		        }
             }
-
-            // Configure Docker to use gcloud as a credential helper
-
-            sh 'gcloud auth configure-docker --quiet'
-
-            // Build the Docker image
-
-            sh "docker build -t ${GCR_URL}/${IMAGE_NAME}:latest ."
-
-            // Push the Docker image to GCR
-
-            sh "docker push ${GCR_URL}/${IMAGE_NAME}:latest"
-
         }
-
+        stage('Build') {
+            steps {               
+                 script {
+			        if (env.GIT_BRANCH == 'origin/main') {
+                        sh '''
+                        docker build -t michaelyarborough/project-flask-api -t michaelyarborough/project-flask-api:prod-v${BUILD_NUMBER} .
+                        '''
+                    } else if (env.GIT_BRANCH == 'origin/dev') {
+                        sh '''
+                        docker build -t michaelyarborough/project-flask-api -t michaelyarborough/project-flask-api:dev-v${BUILD_NUMBER} .
+                        '''
+                    } else {
+                        sh '''
+                        echo "Unrecognised branch"
+                        '''
+                    }
+		        }
+             }
+        }   
+        stage('Push') {
+            steps {
+                script {
+			        if (env.GIT_BRANCH == 'origin/main') {
+                        sh '''
+                        docker push michaelyarborough/project-flask-api
+                        docker push michaelyarborough/pproject-flask-api:prod-v${BUILD_NUMBER}
+                        '''
+                    } else if (env.GIT_BRANCH == 'origin/dev') {
+                         sh '''
+                            docker push michaelyarborough/project-flask-api
+                            docker push michaelyarborough/pproject-flask-api:dev-v${BUILD_NUMBER}
+                          
+                            '''
+                    } else {
+                        sh '''
+                        echo "Unrecognised branch"
+                        '''
+                    }
+		        }
+          }
+        }
+        stage('Deploy') {
+            steps {
+                 script {
+			        if (env.GIT_BRANCH == 'origin/main') {
+                        sh '''
+                        kubectl apply -n prod -f ./kubernetes
+                        kubectl set image deployment/flask-api-deployment flask-container=michaelyarborough/project-flask-api:prod-v${BUILD_NUMBER} -n prod
+                        '''
+                    } else if (env.GIT_BRANCH == 'origin/dev') {
+                        sh '''
+                        kubectl apply -n dev -f ./kubernetes
+                        kubectl set image deployment/flask-api-deployment flask-container=michaelyarborough/project-flask-api:dev-v${BUILD_NUMBER} -n dev
+                        '''
+                    } else {
+                        sh '''
+                        echo "Unrecognised branch"
+                        '''
+                    }    
+            }
+        }
     }
-
-        }
-        stage('Deploy to GKE') {
+        stage('CleanUp') {
 
             steps {
-
                 script {
-
-                    // Deploy to GKE using Jenkins Kubernetes Engine Plugin
-
-                    step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'kubernetes/deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
-
+                if(env.GIT_BRANCH == 'origin/main') {
+                    sh '''
+                    docker rmi michaelyarborough/project-flask-api:prod-v${BUILD_NUMBER}  
+                                        '''
+                } else if(env.GIT_BRANCH == 'origin/dev') {
+                    sh '''
+                    docker rmi michaelyarborough/project-flask-api:dev-v${BUILD_NUMBER}  
+                    '''
                 }
-
             }
-
+            sh '''
+            docker rmi michaelyarborough/project-flask-api:latest
+            docker system prune -f
+            '''
+               
+            }
         }
-
     }
-
 }
