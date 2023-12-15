@@ -45,12 +45,12 @@ pipeline {
 			        if (env.GIT_BRANCH == 'origin/main') {
                         sh '''
                         docker push michaelyarborough/project-flask-api
-                        docker push michaelyarborough/pproject-flask-api:prod-v${BUILD_NUMBER}
+                        docker push michaelyarborough/project-flask-api:prod-v${BUILD_NUMBER}
                         '''
                     } else if (env.GIT_BRANCH == 'origin/dev') {
                          sh '''
                             docker push michaelyarborough/project-flask-api
-                            docker push michaelyarborough/pproject-flask-api:dev-v${BUILD_NUMBER}
+                            docker push michaelyarborough/project-flask-api:dev-v${BUILD_NUMBER}
                           
                             '''
                     } else {
