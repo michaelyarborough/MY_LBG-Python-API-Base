@@ -88,11 +88,11 @@ pipeline {
                 script {
                 if(env.GIT_BRANCH == 'origin/main') {
                     sh '''
-                    docker rmi michaelyarborough/project-flask-api:prod-v${BUILD_NUMBER}  
+                    docker rmi michaelyarborough/project-flask-api:prod-v${BUILD_NUMBER}
                                         '''
                 } else if(env.GIT_BRANCH == 'origin/dev') {
                     sh '''
-                    docker rmi michaelyarborough/project-flask-api:dev-v${BUILD_NUMBER}  
+                    docker rmi michaelyarborough/project-flask-api:dev-v${BUILD_NUMBER} 
                     '''
                 }
             }

@@ -19,7 +19,7 @@ spec:
         app: flask-api
     spec:
        containers:
-       - name: flask-acontainer
+       - name: flask-container
          image: michaelyarborough/project-flask-api:latest
          imagePullPolicy: Always
          ports: 
